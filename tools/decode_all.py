@@ -11,7 +11,9 @@ def main():
         index = json.load(open(index_path))
         packs = [e["pack"] for e in index]
     else:
-        packs = sorted(d for d in os.listdir(root) if d.startswith("image_pack_"))
+        packs = sorted(d for d in os.listdir(root)
+                       if os.path.isdir(os.path.join(root, d))
+                       and os.path.exists(os.path.join(root, d, "meta.json")))
 
     sys.path.insert(0, root)
     ok = fail = 0
