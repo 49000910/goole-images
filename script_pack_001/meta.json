@@ -1,0 +1,15 @@
+{
+  "name": "SN\u7f16\u7801\u81ea\u52a8\u6821\u9a8c\uff08\u65e0\u9762\u677f\u7248\uff0c\u9f20\u6807\u60ac\u6d6e\u767d\u5e95\u4fe1\u606f\u5361\uff09-v2.7.18.user.js",
+  "chunk_size": 16384,
+  "method": {
+    "compress": "zlib",
+    "encode": "base64",
+    "obfuscation": "xor_123"
+  },
+  "chunks": [
+    "chunks/part_0000.bin",
+    "chunks/part_0001.bin"
+  ],
+  "sha256": "3139ac7a7718ee6da20622d18ed9dee2a377dfde1ad0007906a38dccbd481908",
+  "srcSize": 83716
+}
