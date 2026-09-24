@@ -1,0 +1,16 @@
+{
+  "name": "MES \u4e00\u4f53\u5316\uff08\u56fa\u5b9a\u94fe\u63a5+\u6279\u91cf\u8fc7\u7ad9\uff09-v3.4.12.user.js",
+  "chunk_size": 16384,
+  "method": {
+    "compress": "zlib",
+    "encode": "base64",
+    "obfuscation": "xor_123"
+  },
+  "chunks": [
+    "chunks/part_0000.bin",
+    "chunks/part_0001.bin",
+    "chunks/part_0002.bin"
+  ],
+  "sha256": "cd74de2683b217698abdd4f34b97f90ac153f896ab50952c944a8702096a3e63",
+  "srcSize": 120391
+}
