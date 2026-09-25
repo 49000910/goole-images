@@ -1,0 +1,48 @@
+# =====================================================================
+# 全局配置(现场部署时只需要改这个文件)
+# =====================================================================
+
+ocr:
+  text_score: 0.5        # 低于该置信度的 OCR 文本行直接丢弃
+
+# 规则文件位置(相对项目根目录;一般不用改,规则内容维护见 rules/rules.yaml)
+rules_file: rules/rules.yaml
+
+# ---------------------------------------------------------------------
+# MES+ 查询接口
+# TODO(上线必改):
+#   1. mock 改为 false
+#   2. base_url  改成现场 MES+ 服务器地址
+#   3. query_path 改成真实查询接口路径,{field}/{value} 会被替换成字段名和 OCR 提取值
+#      例: "/api/v1/production/query?field={field}&value={value}"
+#   4. 按现场鉴权方式设置 auth.type(bearer / basic / none),
+#      凭据通过环境变量提供:MES_PLUS_TOKEN 或 MES_PLUS_USER / MES_PLUS_PASSWORD
+# ---------------------------------------------------------------------
+mes_plus:
+  mock: true
+  base_url: "http://MES-PLUS-SERVER-ADDR"
+  method: GET
+  query_path: "/api/v1/query?field={field}&value={value}"
+  headers:
+    Content-Type: application/json
+    Accept: application/json
+  auth:
+    type: bearer            # bearer | basic | none
+    token_env: MES_PLUS_TOKEN
+    username_env: MES_PLUS_USER
+    password_env: MES_PLUS_PASSWORD
+  timeout_seconds: 10
+  retries: 2
+  verify_ssl: true
+  # mock 模式的固定返回,可按现场真实返回结构改造成一致,方便前端联调
+  mock_response:
+    code: 0
+    message: "ok"
+    data:
+      workOrderNo: "WO-20260925-001"
+      product: "示例产品"
+      status: "RUNNING"
+
+output:
+  dir: out                 # 结果 JSON 输出目录
+  save_json: true

@@ -1,0 +1,9 @@
+# 核心依赖(离线安装:python -m pip install --no-index --find-links wheels -r requirements.txt)
+rapidocr>=3.0
+onnxruntime>=1.17
+# rapidocr 未锁 omegaconf 下限,但 2.0.x 不接受 Path 类型会崩,必须 >=2.1
+omegaconf>=2.1
+ruamel.yaml>=0.18
+requests>=2.31
+PyYAML>=6.0
+Pillow>=10.0

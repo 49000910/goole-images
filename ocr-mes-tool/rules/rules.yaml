@@ -1,0 +1,112 @@
+# =====================================================================
+# OCR 规则库(固定维护文件)
+# ---------------------------------------------------------------------
+# 维护规约(必须遵守):
+#   1. 本文件是 OCR 规则的唯一维护入口,禁止在代码里写死规则;
+#   2. 所有增删改一律通过 `python rule_manager.py ...` 进行,保持格式一致;
+#   3. 任何修改都要 git 提交留痕,便于追溯谁在何时改了哪条规则;
+#   4. 改动后先跑 `python rule_manager.py test <规则ID> --text "..."` 再提交。
+#
+# 字段说明:
+#   id         规则唯一标识(英文,不可重复)
+#   name       中文名(控制台显示)
+#   enabled    true/false,停用规则建议用 enabled: false 而不是删除
+#   required   true=必填字段,图片里没识别到时整体结果判为"存在问题"
+#   match      匹配方式:
+#                type: regex          全文正则,group 指定取第几个捕获组(默认 1)
+#                type: after_keyword  行内关键字后取值,自动剥离 : : = - 等分隔符
+#                type: contains       只要包含关键字即命中(不提取值)
+#   validate   校验列表(可叠加):
+#                {type: regex,   pattern: "..."}   整值完全匹配
+#                {type: length,  min: 1, max: 32}  长度范围
+#                {type: choices, values: [..]}     枚举白名单
+#                {type: numeric, min: 0, max: 100} 数值范围
+#   mes_query  field: 提取的值要送去 MES+ 查询用的字段名(留空则只提取不查询)
+# =====================================================================
+rules:
+  - id: work_order_no
+    name: 工单号
+    enabled: true
+    required: true
+    match:
+      type: regex
+      pattern: '(?:工单号|工单|WO)\s*[:：=]?\s*([A-Za-z0-9\-]{6,32})'
+      group: 1
+    validate:
+      - type: regex
+        pattern: '[A-Za-z0-9\-]+'
+      - type: length
+        min: 6
+        max: 32
+    mes_query:
+      field: workOrderNo
+
+  - id: product_sn
+    name: 产品序列号
+    enabled: true
+    required: true
+    match:
+      type: regex
+      pattern: '(?:序列号|SN)\s*[:：=]?\s*([A-Za-z0-9]{8,24})'
+      group: 1
+    validate:
+      - type: length
+        min: 8
+        max: 24
+    mes_query:
+      field: sn
+
+  - id: material_code
+    name: 物料编码
+    enabled: true
+    required: false
+    match:
+      type: regex
+      pattern: '(?:物料编码|物料|料号)\s*[:：=]?\s*([A-Za-z0-9\-\.]{4,32})'
+      group: 1
+    validate:
+      - type: length
+        min: 4
+        max: 32
+    mes_query:
+      field: materialCode
+
+  - id: batch_no
+    name: 批次号
+    enabled: true
+    required: false
+    match:
+      type: after_keyword
+      pattern: "批号"
+      max_len: 24
+    validate:
+      - type: regex
+        pattern: '[A-Za-z0-9\-]+'
+    mes_query:
+      field: lotNo
+
+  - id: product_date
+    name: 生产日期
+    enabled: true
+    required: false
+    match:
+      type: regex
+      pattern: '(?:生产日期|DATE)\s*[:：=]?\s*(\d{4}[-/年.]\d{1,2}[-/月.]\d{1,2})'
+      group: 1
+    validate:
+      - type: regex
+        pattern: '\d{4}[-/年.]\d{1,2}[-/月.]\d{1,2}'
+    # mes_query 留空:日期只提取,不查 MES+
+
+  - id: process_route
+    name: 工序
+    enabled: true
+    required: false
+    match:
+      type: after_keyword
+      pattern: "工序"
+      max_len: 16
+    validate:
+      - type: choices
+        values: ["注塑", "SMT", "组装", "包装", "测试"]
+    # 校验枚举里没有的值会记 errors,整体结果判为"存在问题"
