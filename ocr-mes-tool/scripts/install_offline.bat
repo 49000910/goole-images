@@ -16,5 +16,5 @@ if errorlevel 1 (
   exit /b 1
 )
 echo.
-echo [成功] 依赖安装完成。验证: python main.py samples\sample_label.png
+echo [成功] 依赖安装完成。验证: python gui_main.py 或 python main.py samples\sample_label.png
 pause

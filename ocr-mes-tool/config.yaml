@@ -46,3 +46,7 @@ mes_plus:
 output:
   dir: out                 # 结果 JSON 输出目录
   save_json: true
+
+# GUI 拍照采集页的图片保存目录(也可在界面「相机参数」折叠面板里临时改)
+capture:
+  save_dir: captures

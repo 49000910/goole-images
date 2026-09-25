@@ -3,6 +3,7 @@
 拍照/图片里的关键字段(工单号、序列号、物料、批号……)通过 **OCR 自动提取**,
 按 **固定维护的规则** 匹配校验,再 **调用 MES+ 查询接口** 核对,结果落盘 JSON。
 整套依赖已打包进 `wheels/`,产线机器**不联网也能装**。
+提供 **分页图形界面**(GUI 主程序)与**命令行脚本**两套入口。
 
 ```
 图片 ──> RapidOCR(离线) ──> 规则匹配/校验(rules/rules.yaml) ──> MES+ 查询接口 ──> 控制台 + out/*.json
@@ -12,7 +13,8 @@
 
 ```
 ocr-mes-tool/
-├── main.py                 # 运行入口:python main.py 图片...
+├── gui_main.py             # ★ GUI 主程序入口:python gui_main.py(分页工作台)
+├── main.py                 # 命令行入口:python main.py 图片...
 ├── rule_manager.py         # 规则维护入口:python rule_manager.py --help
 ├── config.yaml             # 全局配置(MES+ 地址/鉴权/OCR 参数)——现场部署只改这里
 ├── rules/rules.yaml        # ★ OCR 规则库(固定维护文件,唯一维护入口)
@@ -20,12 +22,40 @@ ocr-mes-tool/
 │   ├── ocr_engine.py       #   RapidOCR 封装(模型随包内置,离线可用)
 │   ├── rule_engine.py      #   规则匹配 + 校验引擎
 │   ├── mes_client.py       #   MES+ 查询客户端(可配鉴权、mock、重试)
-│   └── pipeline.py         #   主流程串联
+│   ├── pipeline.py         #   主流程串联(GUI 与命令行共用)
+│   └── gui/                #   分页界面(tkinter,零新增依赖)
+│       ├── app.py          #     主窗口:4 个页签 + 状态栏 + 后台线程调度
+│       ├── widgets.py      #     可折叠面板 CollapsibleFrame、滚动容器
+│       ├── page_capture.py #     拍照采集页(预览/拍照/可折叠相机参数与采集历史)
+│       ├── page_recognize.py  #  识别与MES查询页
+│       ├── page_rules.py   #     规则维护页(查看/启停/测试)
+│       └── page_settings.py   #  设置页(读写 config.yaml,保留注释)
 ├── tests/                  # 端到端验证(生成样例标签图 → 全流程断言)
 ├── samples/                # 样例标签图
 ├── scripts/                # 依赖打包 + 离线安装脚本
 └── wheels/                 # ★ 全部依赖 wheel(离线包,Windows 64 位 / CPython 3.14)
 ```
+
+## 图形界面(推荐日常使用)
+
+```bat
+python gui_main.py
+```
+
+四个页签:
+
+1. **拍照采集** —— 相机预览(选设备/分辨率)、一键拍照、从文件导入;
+   下方两个**可折叠面板**:「相机参数」(镜像/保存目录)与「采集历史」
+   (缩略图墙,单击选中、双击直接送去识别,可删除)。
+2. **识别与MES查询** —— 字段提取与校验表格、MES+ 返回原文、整体结论
+   (通过/存在问题);识别在后台线程执行,界面不卡。
+3. **规则维护** —— 规则一览、启用/停用、输入文本即时测试规则;
+   新增/删除等复杂编辑仍走命令行 `rule_manager.py`(保注释、可 git 留痕)。
+4. **设置** —— 可视化修改 MES+ 地址/接口/鉴权/超时与 OCR 阈值,保存写回
+   `config.yaml` 且**保留原有注释**;一键测试 MES+ 连通性。
+
+典型工作流:拍照采集页拍照 → 双击缩略图(或选中后点「发送到识别查询页」)
+→ 自动识别并查 MES+ → 查看结论。
 
 ## 快速开始
 
@@ -35,7 +65,10 @@ ocr-mes-tool/
 :: 1. 装好 Python 3.14(64 位)后,双击或执行:
 scripts\install_offline.bat
 
-:: 2. 验证(mock 模式,不发真实请求):
+:: 2. 打开图形界面(拍照采集 → 识别查询 → 设置):
+python gui_main.py
+
+:: 3. 或用命令行验证(mock 模式,不发真实请求):
 python main.py samples\sample_label.png
 ```
 
