@@ -10,6 +10,7 @@ Pipeline: raw bytes -> zlib -> XOR(key=123) -> base64 -> N x chunk_size text chu
 | image_pack_001 | capture_20260924_101750.jpg (4000x3000) | 4194348 | 4096 |
 | image_pack_002 | capture_20260924_151933.jpg | 4505606 | 16384 |
 | image_pack_003 | capture_20260924_182329.jpg | 2864685 | 16384 |
+| image_pack_004 | IMG_20260928154333.jpg | 6585578 | 16384 |
 | script_pack_001 | SN编码自动校验...-v2.7.18.user.js | 83716 | 16384 |
 | script_pack_002 | MES 一体化...-v3.4.12.user.js | 120391 | 16384 |
 
@@ -25,7 +26,7 @@ All packs verified: restored byte-identical (sha256).
     cd goole-images
     python tools/decode_all.py . ./out      # 还原所有 pack
     # 或单包:
-    python image_pack_002/decode.py image_pack_002 ./out
+    python image_pack_004/decode.py image_pack_004 ./out
 
 Public repo, no token needed.
 
